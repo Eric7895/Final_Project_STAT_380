@@ -56,7 +56,7 @@ cvfit <- cv.glmnet(x[-testid, ], y[-testid], type.measure = "mae") # Create the 
 cpred <- predict(cvfit, x[testid, ], s = "lambda.min") # Create a plot using the lambda that produce the minimum MSE
 mean(abs(y[testid] - cpred)) # Calculate the mean absolute error 
 
-#plot(cvfit)
+plot(cvfit)
 #plot(cpred)
 ```
 
