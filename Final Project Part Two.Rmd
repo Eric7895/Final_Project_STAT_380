@@ -37,6 +37,28 @@ Here's the list of variables used and explained by the contributor of the datase
 
 -   Point of Contact (Posted.On): Whom should you contact for more information regarding the Houses/Apartments/Flats
 
+```{r libraries and dataset}
+#| echo = FALSE,
+#| warning = FALSE,
+#| message = FALSE
+
+# Load essential libraries
+library(tidyverse)
+library(ggplot2)
+library(keras)
+library(ISLR2)
+
+# Load the dataset
+hrp <- read.csv("House_Rent_Dataset.csv")
+```
+
+```{r parameters}
+#| echo = FALSE
+
+# Set up all parameters
+seed <- 123
+```
+
 ## Exploratory Data Analysis
 
 ### Data Visualization
