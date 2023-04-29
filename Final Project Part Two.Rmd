@@ -1,0 +1,54 @@
+---
+title: "Final Project: Report 2"
+author: "Eric Wu"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+## Introduction
+
+We decided to use the "House Rent Prediction" (HRP) dataset found on Kaggle, a data science community known for its enriched various data sources.
+The HRP dataset consists of 4700+ observations and 11 attributes that allow us to make a prediction on the number of rents given a variety of attributes.
+
+Here's the list of variables used and explained by the contributor of the dataset:
+
+-   BHK: Number of Bedrooms, Hall, Kitchen
+
+-   Rent: Rent of the Houses/Apartments/Flats
+
+-   Size: Size of the Houses/Apartments/Flats in Square Feet
+
+-   Floor: Houses/Apartments/Flats situated on which Floor and Total Number of Floors (Example: Ground out of 2, 3 out of 5, etc.)
+
+-   Area Type: Size of the Houses/Apartments/Flats calculated on either Super Area or Carpet Area or Build Area.
+
+-   Area Locality (Area.Locality): Locality of the Houses/Apartments/Flats
+
+-   City: City where the Houses/Apartments/Flats are Located
+
+-   Furnishing Status: Furnishing Status of the Houses/Apartments/Flats, either it is Furnished or Semi-Furnished or Unfurnished
+
+-   Tenant Preferred: Type of Tenant Preferred by the Owner or Agent
+
+-   Bathroom: Number of Bathrooms
+
+-   Point of Contact (Posted.On): Whom should you contact for more information regarding the Houses/Apartments/Flats
+
+## Exploratory Data Analysis
+
+## Methodology
+
+Our plan are to compare and contrast a multiple regression model, a KNN regression model, and a single-layer neural network in predicting the rent based using other predictors in the dataset. All model will involved some sort of variable selections, whether it's using other functions or included in model building, this is very beneficial when we are doing model selections. The primary focus is to compare the RMSE produced by each model. 
+
+### Multiple Linear Regression
+
+### KNN Regression
+
+### Single-Layer Neural Network
+
+## Discussion
+
+## Conclusion
