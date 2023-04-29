@@ -39,9 +39,15 @@ Here's the list of variables used and explained by the contributor of the datase
 
 ## Exploratory Data Analysis
 
+### Data Visualization
+
+### Hierarchical clustering
+
 ## Methodology
 
-Our plan are to compare and contrast a multiple regression model, a KNN regression model, and a single-layer neural network in predicting the rent based using other predictors in the dataset. All model will involved some sort of variable selections, whether it's using other functions or included in model building, this is very beneficial when we are doing model selections. The primary focus is to compare the RMSE produced by each model. 
+Our plan is to compare and contrast a multiple regression model, a KNN regression model, and a single-layer neural network in predicting the rent based using other predictors in the dataset.
+All models will involve some sort of variable selection, whether it's using other functions or included in model building, this is very beneficial when we are doing model selections.
+The primary focus is to compare the RMSE produced by each model.
 
 ### Multiple Linear Regression
 
