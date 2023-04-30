@@ -52,11 +52,23 @@ library(ISLR2)
 hrp <- read.csv("House_Rent_Dataset.csv")
 ```
 
-```{r parameters}
+```{r parameters and set ups}
 #| echo = FALSE
 
 # Set up all parameters
 seed <- 123
+
+# Set up the necessary matrix
+x <- scale(model.matrix(Rent ~ . - 1, data = hrp)) # Create an scale a model matrix that's similar to linear model. 
+y <- hrp$Rent
+
+# Set up the training/testing split
+set.seed(seed)
+train_ind <- sample(1:nrow(hrp), floor(0.8 * nrow(hrp)))
+set.seed(NULL)
+
+train = hrp[train_ind, ]
+test = hrp[-train_ind, ]
 ```
 
 ## Exploratory Data Analysis
@@ -76,6 +88,27 @@ The primary focus is to compare the RMSE produced by each model.
 ### KNN Regression
 
 ### Single-Layer Neural Network
+```{r single layer neural network}
+modnn <- keras_model_sequential() %>%
+     layer_dense(units = 2351, activation = "relu", 
+        input_shape = ncol(x)) %>% # Create a hidden layer with 2351 hidden units and a ReLU activation function
+     layer_dropout(rate = 0.4) %>% # Create a dropout layer in which a random 40% of the 50 activation from the previous layer are set to zero during each iteration of stochastic gradiant descent algorithm (An optimization algorithm often used to find the model parameter that correspond to the best fit between predicted and actual outputs)
+     layer_dense(units = 1) # The output layer has just one unit with no activation function, indicating that the model provides a single quantitative output.
+
+modnn %>% compile(loss = "mse", # This adds details to the fitting algorithm that minimize the squared-error loss as it tracks the mean absolute error on the training data, and on the testing data if it is supplied. 
+    optimizer = optimizer_rmsprop(),
+    metrics = list("mean_square_error")
+   )
+
+# Now we are actually fitting the model 
+history <- modnn %>% fit(
+     train, test, epochs = 600, batch_size = 32,
+    validation_data = list(train, test)
+  )
+
+npred <- predict(modnn, test)
+
+```
 
 ## Discussion
 
