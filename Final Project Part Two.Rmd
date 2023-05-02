@@ -52,23 +52,51 @@ library(ISLR2)
 hrp <- read.csv("House_Rent_Dataset.csv")
 ```
 
+```{r data cleaning}
+#| echo = FALSE
+
+# Create indicator variables
+hrp_update <- hrp %>%
+  mutate(
+    Area.indicator = case_when(
+      Area.Type == "Built Area" ~ 1,
+      Area.Type == "Carpet Area" ~ 2,
+      Area.Type == "Super Area" ~ 3
+    ),
+    Furnishing.indicator = case_when(
+      Furnishing.Status == "Furnished" ~ 1,
+      Furnishing.Status == "Semi-Furnished" ~ 2,
+      Furnishing.Status == "Unfurnished" ~ 3
+    ),
+    Contact.indicator = case_when(
+      Point.of.Contact == "Contact Agent" ~ 1,
+      Point.of.Contact == "Contact Builder" ~ 2,
+      Point.of.Contact == "Contact Owner" ~ 3
+    )
+  )
+```
+
 ```{r parameters and set ups}
 #| echo = FALSE
 
 # Set up all parameters
 seed <- 123
 
-# Set up the necessary matrix
-x <- scale(model.matrix(Rent ~ . - 1, data = hrp)) # Create an scale a model matrix that's similar to linear model. 
-y <- hrp$Rent
+# Scale the data
+xvars <- c("BHK", "Size", "Area.indicator", "Furnishing.indicator", "Bathroom", "Contact.indicator")
+hrp_update[ , xvars] <- scale(hrp_update[ , xvars], center = TRUE, scale = TRUE)
+
+# Set up the necessary matrix for neural network
+x <- scale(model.matrix(Rent ~ BHK + Size + Area.indicator + Furnishing.indicator + Bathroom + Contact.indicator - 1, data = hrp_update))
+y <- hrp_update$Rent
 
 # Set up the training/testing split
 set.seed(seed)
-train_ind <- sample(1:nrow(hrp), floor(0.8 * nrow(hrp)))
+train_ind <- sample(1:nrow(hrp_update), floor(0.8 * nrow(hrp_update)))
 set.seed(NULL)
 
-train = hrp[train_ind, ]
-test = hrp[-train_ind, ]
+train_scale = hrp_update[train_ind, ]
+test_scale = hrp_update[-train_ind, ]
 ```
 
 ## Exploratory Data Analysis
@@ -88,27 +116,36 @@ The primary focus is to compare the RMSE produced by each model.
 ### KNN Regression
 
 ### Single-Layer Neural Network
+
 ```{r single layer neural network}
+
 modnn <- keras_model_sequential() %>%
      layer_dense(units = 2351, activation = "relu", 
-        input_shape = ncol(x)) %>% # Create a hidden layer with 2351 hidden units and a ReLU activation function
-     layer_dropout(rate = 0.4) %>% # Create a dropout layer in which a random 40% of the 50 activation from the previous layer are set to zero during each iteration of stochastic gradiant descent algorithm (An optimization algorithm often used to find the model parameter that correspond to the best fit between predicted and actual outputs)
-     layer_dense(units = 1) # The output layer has just one unit with no activation function, indicating that the model provides a single quantitative output.
+        input_shape = ncol(x)) %>% 
+     layer_dropout(rate = 0.4) %>% 
+     layer_dense(units = 1)
 
-modnn %>% compile(loss = "mse", # This adds details to the fitting algorithm that minimize the squared-error loss as it tracks the mean absolute error on the training data, and on the testing data if it is supplied. 
+modnn %>% compile(loss = "mse",  
     optimizer = optimizer_rmsprop(),
-    metrics = list("mean_square_error")
+    metrics = list("mse")
    )
 
-# Now we are actually fitting the model 
-history <- modnn %>% fit(
-     train, test, epochs = 600, batch_size = 32,
-    validation_data = list(train, test)
-  )
+#history <- modnn %>% fit(
+#     x[train_ind, ], y[train_ind], epochs = 600, batch_size = 32, # 
+#    validation_data = list(x[-train_ind, ], y[-train_ind]) 
+#  )
 
-npred <- predict(modnn, test)
+#npred <- predict(modnn, x[-train_ind, ])
+#nn_mse <- mean((y[-train_ind] - npred)^2)
+#sqrt(nn_mse)
+
+## 43418.85
 
 ```
+
+![Image 1: Training Results from single-layer Neural Network](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot.PNG)
+
+The structure of the single-layer neural network is very similar to the lab, except for the 2351 hidden units, and we are measuring the Mean Square Error(MSE) instead of the Mean Absolute Error(MAE). The RMSE resulting from the training end up being 43418.85. And base on the loss function graph, the MSE of the validation(testing) set is significantly smaller than the training set. Which indicates better performance in the testing set. 
 
 ## Discussion
 
