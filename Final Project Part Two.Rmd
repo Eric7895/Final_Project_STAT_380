@@ -95,6 +95,8 @@ set.seed(seed)
 train_ind <- sample(1:nrow(hrp_update), floor(0.8 * nrow(hrp_update)))
 set.seed(NULL)
 
+train = hrp[train_ind, ]
+test = hrp[-train_ind, ]
 train_scale = hrp_update[train_ind, ]
 test_scale = hrp_update[-train_ind, ]
 ```
@@ -112,6 +114,23 @@ All models will involve some sort of variable selection, whether it's using othe
 The primary focus is to compare the RMSE produced by each model.
 
 ### Multiple Linear Regression
+
+```{r}
+base_model <- lm(Rent ~ . - Area.Locality - Floor - Posted.On, data=train)
+
+linear_model <- step(base_model, direction="backward")
+```
+```{r}
+linpred <- predict(linear_model, newdata=test)
+
+test_linpred <- 
+  test %>%
+  cbind(linpred) %>%
+  mutate(Resid.Square = (Rent-linpred)^2)
+
+sqrt(sum(test_linpred$Resid.Square)/nrow(test_linpred))
+```
+RMSE with this seed (123) for multiple linear regression is 42803.14.
 
 ### KNN Regression
 
