@@ -105,6 +105,29 @@ test_scale = hrp_update[-train_ind, ]
 
 ### Data Visualization
 
+```{r}
+hrp %>%
+  group_by(Tenant.Preferred) %>%
+  count()
+```
+
+```{r}
+hrp %>%
+  ggplot(mapping=aes(x=Size, y=Tenant.Preferred)) +
+  geom_boxplot()
+```
+
+It seems as though houses that prefer families as tenants may be slightly larger on average than those that prefer bachelors, although the difference is not significant. Houses with no preference, however, seem to be slightly smaller than both on average but there are many more upper outliers. These results may be skewed however, as there are significantly more houses with no preference than those with a preference either way.
+
+
+```{r}
+hrp %>%
+  ggplot(mapping=aes(x=Bathroom, y=Furnishing.Status)) +
+  geom_boxplot()
+```
+
+Clearly Unfurnished houses tend to have less bathrooms than Semi-Furnished and Furnished houses, while Semi-Furnished and Furnished houses seem to generally have the same amount of bathrooms as each other.
+
 ### Hierarchical clustering
 
 ## Methodology
