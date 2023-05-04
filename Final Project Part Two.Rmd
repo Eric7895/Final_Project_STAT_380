@@ -47,6 +47,7 @@ library(tidyverse)
 library(ggplot2)
 library(keras)
 library(ISLR2)
+library(FNN)
 
 # Load the dataset
 hrp <- read.csv("House_Rent_Dataset.csv")
@@ -143,6 +144,7 @@ base_model <- lm(Rent ~ . - Area.Locality - Floor - Posted.On, data=train)
 
 linear_model <- step(base_model, direction="backward")
 ```
+
 ```{r}
 linpred <- predict(linear_model, newdata=test)
 
@@ -156,6 +158,33 @@ sqrt(sum(test_linpred$Resid.Square)/nrow(test_linpred))
 RMSE with this seed (123) for multiple linear regression is 42803.14.
 
 ### KNN Regression
+
+```{r}
+xvars <- names(select_if(train_scale, is.numeric))
+maxK <- 20 
+mse_vec <- rep(NA, maxK)
+rmse_vec <- rep(NA, maxK)
+
+for(i in 1:maxK){
+  knn_res <- knn.reg(train = train_scale[ , xvars, drop = FALSE],
+                   test = test_scale[ , xvars, drop = FALSE],
+                   y = train_scale$Rent,
+                   k = i)
+  
+  mse_vec[i] <- mean((test_scale$Rent - knn_res$pred)^2)
+
+  rmse_vec[i] <- sqrt(mse_vec[i])
+}
+choice_k <- data.frame(k = 1:maxK, rmse = rmse_vec)
+ggplot(data = choice_k, mapping = aes(x = k, y = rmse)) +
+   geom_line()
+# Based on the graph the best K value seems to be the lowest point on the graph.
+```
+
+```{r}
+# Based on the front of this vector the best K value is 2.
+head(choice_k)
+```
 
 ### Single-Layer Neural Network
 
