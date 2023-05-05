@@ -236,20 +236,22 @@ modnn %>% compile(loss = "mse",
     metrics = list("mse")
    )
 
-#history <- modnn %>% fit(
-#     x[train_ind, ], y[train_ind], epochs = 600, batch_size = 32, # 
-#    validation_data = list(x[-train_ind, ], y[-train_ind]) 
-#  )
+history <- modnn %>% fit(
+     x[train_ind, ], y[train_ind], epochs = 600, batch_size = 32, # 
+    validation_data = list(x[-train_ind, ], y[-train_ind]) 
+  )
 
-#npred <- predict(modnn, x[-train_ind, ])
-#nn_mse <- mean((y[-train_ind] - npred)^2)
-#sqrt(nn_mse)
+npred <- predict(modnn, x[-train_ind, ])
+nn_mse <- mean((y[-train_ind] - npred)^2)
+sqrt(nn_mse)
 
 ## 43418.85
 
+# ![Image 1: Training Results from single-layer Neural Network](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot.PNG)
+
 ```
 
-![Image 1: Training Results from single-layer Neural Network](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot.PNG)
+
 
 The structure of the single-layer neural network is very similar to the lab, except for the 2351 hidden units, and we are measuring the Mean Square Error(MSE) instead of the Mean Absolute Error(MAE).
 The RMSE resulting from the training end up being 43418.85.
@@ -257,31 +259,32 @@ And base on the loss function graph, the MSE of the validation(testing) set is s
 Which indicates better performance in the testing set.
 
 ```{r impact of seed on neural network}
-#modnn2 <- keras_model_sequential() %>%
-#     layer_dense(units = 2351, activation = "relu", 
-#        input_shape = ncol(x)) %>% 
-#     layer_dropout(rate = 0.4) %>% 
-#     layer_dense(units = 1)
+modnn2 <- keras_model_sequential() %>%
+     layer_dense(units = 2351, activation = "relu", 
+        input_shape = ncol(x)) %>% 
+     layer_dropout(rate = 0.4) %>% 
+     layer_dense(units = 1)
 
-#modnn2 %>% compile(loss = "mse",  
-#    optimizer = optimizer_rmsprop(),
-#    metrics = list("mse")
-#   )
+modnn2 %>% compile(loss = "mse",  
+    optimizer = optimizer_rmsprop(),
+    metrics = list("mse")
+   )
 
-#history2 <- modnn2 %>% fit(
-#     x[train_ind_alter, ], y[train_ind_alter], epochs = 600, batch_size = 32, # 
-#    validation_data = list(x[-train_ind_alter, ], y[-train_ind_alter]) 
-#  )
+history2 <- modnn2 %>% fit(
+     x[train_ind_alter, ], y[train_ind_alter], epochs = 600, batch_size = 32, # 
+    validation_data = list(x[-train_ind_alter, ], y[-train_ind_alter]) 
+  )
 
-#npred2 <- predict(modnn2, x[-train_ind_alter, ])
-#nn_mse2 <- mean((y[-train_ind_alter] - npred2)^2)
-#sqrt(nn_mse2)
+npred2 <- predict(modnn2, x[-train_ind_alter, ])
+nn_mse2 <- mean((y[-train_ind_alter] - npred2)^2)
+sqrt(nn_mse2)
 
 # 37620.59
 
+# ![Image 2: Training Results from a single-layer Neural Network with alternative seed](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot2.PNG)
 ```
 
-![Image 2: Training Results from a single-layer Neural Network with alternative seed](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot2.PNG)
+
 
 Image 2 demonstrates the effect of random seed on the neural network, as shown, the MSE is greatly reduced and the RMSE decreases from 43418.85 to 37620.59.
 
