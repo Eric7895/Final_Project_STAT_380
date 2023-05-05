@@ -287,6 +287,8 @@ On the other hand, the single-layer neural network are not resistant to changed 
 
 ## Conclusion
 
+Overall, the project is very successful and we get to review and learn more about the implementation of various methods that was taught in class. In addition, the project allows us to examine the parameters of single-layer neural network, and the optimzation function that goes along with the train process. 
+
 ## Code Appendix
 ```{r code Appendix}
 #| ref.label = knitr::all_labels(),
