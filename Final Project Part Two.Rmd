@@ -120,6 +120,10 @@ set.seed(NULL)
 train <- hrp[train_ind, ]
 test <- hrp[-train_ind, ]
 
+# Not scaled data with alternative seed
+train_alter_lin <- hrp[train_ind_alter, ]
+test_alter_lin <- hrp[-train_ind_alter, ]
+
 # Scaled data
 train_scale <- hrp_update[train_ind, ]
 test_scale <- hrp_update[-train_ind, ]
@@ -173,9 +177,10 @@ The primary focus is to compare the RMSE produced by each model.
 
 ```{r}
 base_model <- lm(Rent ~ . - Area.Locality - Floor - Posted.On, data=train)
+base_model2 <- lm(Rent ~ . - Area.Locality - Floor - Posted.On, data=train_alter_lin)
 
 linear_model <- step(base_model, direction="backward")
-
+linear_model2 <- step(base_model2, direction="backward")
 ```
 
 ```{r}
@@ -187,10 +192,21 @@ test_linpred <-
   mutate(Resid.Square = (Rent-linpred)^2)
 
 sqrt(sum(test_linpred$Resid.Square)/nrow(test_linpred))
-
 ```
 
-RMSE with this seed (123) for multiple linear regression is 42803.14.
+```{r}
+linpred2 <- predict(linear_model2, newdata=test_alter_lin)
+
+test_linpred2 <- 
+  test_alter_lin %>%
+  cbind(linpred2) %>%
+  mutate(Resid.Square = (Rent-linpred2)^2)
+
+sqrt(sum(test_linpred2$Resid.Square)/nrow(test_linpred2))
+```
+
+RMSE with seed 123 for multiple linear regression is 42803.14, while with seed 12345 RMSE is 39529.23.
+So, there is a potential for slight variations in the RMSE based on the random seed, but not too significant, as this is a less than 10% difference in RMSE.
 
 ### KNN Regression
 
@@ -317,3 +333,4 @@ Overall, the project is very successful and we get to review and learn more abou
 
 ## Contributions
 Caden: KNN regression, Discussion
+Jacob: Multiple Linear Regression, Data Visualization
