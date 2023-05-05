@@ -281,9 +281,7 @@ Which indicates better performance in the testing set.
 
 ```
 
-![Image 2: Training Results from a single-layer Neural Network with alternative seed](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot2.PNG)
-
-Image 2 demonstrates the effect of random seed on the neural network, as shown, the MSE is greatly reduced and the RMSE decreases from 43418.85 to 37620.59.
+On the other hand, the single-layer neural network are not resistant to changed of seed, as the MSE is greatly reduced and the RMSE decreases from 43418.85 to 37620.59. Unfortunately, the picture of the loss function graph is distorted, and we wouldn't able to placed the page here but rather at the end. 
 
 ## Discussion
 
@@ -296,3 +294,5 @@ Image 2 demonstrates the effect of random seed on the neural network, as shown, 
 #| eval = FALSE
 
 ```
+
+![Image 2: Training Results from single-layer Neural Network using alternative seed](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot2.PNG)
