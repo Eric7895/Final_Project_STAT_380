@@ -1,6 +1,6 @@
 ---
 title: 'Final Project: Report 2'
-author: "Eric Wu, Caden Summers"
+author: "Eric Wu, Caden Summers, Jacob O'Leary, Yu-Hsin Liao, Matthew Brady"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
