@@ -1,6 +1,6 @@
 ---
 title: 'Final Project: Report 2'
-author: "Eric Wu"
+author: "Eric Wu, Caden Summers"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
@@ -314,3 +314,6 @@ Overall, the project is very successful and we get to review and learn more abou
 ```
 
 ![Image 2: Training Results from single-layer Neural Network using alternative seed](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot2.PNG)
+
+## Contributions
+Caden: KNN regression, Discussion
