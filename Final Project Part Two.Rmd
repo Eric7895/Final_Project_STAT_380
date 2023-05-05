@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output:
   pdf_document: default
   html_document: default
+  word_document: default
 editor_options:
   markdown:
     wrap: sentence
@@ -197,20 +198,32 @@ RMSE with this seed (123) for multiple linear regression is 42803.14.
 xvars <- names(select_if(train_scale, is.numeric))
 maxK <- 20 
 mse_vec <- rep(NA, maxK)
+mse_vec2 <- rep(NA, maxK)
 rmse_vec <- rep(NA, maxK)
+rmse_vec2 <- rep(NA, maxK)
 
 for(i in 1:maxK){
   knn_res <- knn.reg(train = train_scale[ , xvars, drop = FALSE],
                    test = test_scale[ , xvars, drop = FALSE],
                    y = train_scale$Rent,
                    k = i)
+  knn_res2 <- knn.reg(train = train_alter[ , xvars, drop = FALSE],
+                   test = test_alter[ , xvars, drop = FALSE],
+                   y = train_alter$Rent,
+                   k = i)
   
   mse_vec[i] <- mean((test_scale$Rent - knn_res$pred)^2)
+  mse_vec2[i] <- mean((test_alter$Rent - knn_res2$pred)^2)
 
   rmse_vec[i] <- sqrt(mse_vec[i])
+  rmse_vec2[i] <- sqrt(mse_vec2[i])
 }
 choice_k <- data.frame(k = 1:maxK, rmse = rmse_vec)
 ggplot(data = choice_k, mapping = aes(x = k, y = rmse)) +
+   geom_line()
+
+choice_k2 <- data.frame(k = 1:maxK, rmse = rmse_vec2)
+ggplot(data = choice_k2, mapping = aes(x = k, y = rmse)) +
    geom_line()
 # Based on the graph the best K value seems to be the lowest point on the graph.
 
@@ -219,7 +232,9 @@ ggplot(data = choice_k, mapping = aes(x = k, y = rmse)) +
 ```{r}
 # Based on the front of this vector the best K value is 2.
 head(choice_k)
-
+head(choice_k2)
+# The KNN regression is also not immune to seed changes and in this case results in an RMSE that is 1600 lower than the first seed tested.
+# Although the RMSE has changed significantly, it is still far better than the other methods presented
 ```
 
 ### Single-Layer Neural Network
@@ -284,10 +299,11 @@ Which indicates better performance in the testing set.
 On the other hand, the single-layer neural network are not resistant to changed of seed, as the MSE is greatly reduced and the RMSE decreases from 43418.85 to 37620.59. Unfortunately, the picture of the loss function graph is distorted, and we wouldn't able to placed the page here but rather at the end. 
 
 ## Discussion
+After testing our three methods on the House Rent dataset with the seed set to 123, we got RMSE values of 42,803.14, 2014.33, and 43,418.85 for Multiple Linear regression, KNN regression, and Single-Layer Neural Network respectively. Based on these values it is very clear that the KNN method with a k-value of 2 is significantly better than both of these methods. The performance is roughly 20 times better with this metric alone. We also wanted to test the models accuracy against varying seed values to ensure that they are robust and not easily affected by small changes. From this testing we confirmed that none of the models were immune to changes in the seed. The KNN regression in particular was able to get its RMSE as low as 400 which is far lower than the neural networks ~37,620. 
 
 ## Conclusion
 
-Overall, the project is very successful and we get to review and learn more about the implementation of various methods that was taught in class. In addition, the project allows us to examine the parameters of single-layer neural network, and the optimzation function that goes along with the train process. 
+Overall, the project is very successful and we get to review and learn more about the implementation of various methods that was taught in class. In addition, the project allows us to examine the parameters of single-layer neural network, and the optimization function that goes along with the train process. 
 
 ## Code Appendix
 ```{r code Appendix}
