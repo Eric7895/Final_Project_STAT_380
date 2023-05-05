@@ -334,3 +334,4 @@ Overall, the project is very successful and we get to review and learn more abou
 ## Contributions
 Caden: KNN regression, Discussion
 Jacob: Multiple Linear Regression, Data Visualization
+Eric: Introduction, Neural network, conclusion
