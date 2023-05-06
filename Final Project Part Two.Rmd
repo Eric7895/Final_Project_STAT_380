@@ -298,6 +298,7 @@ Which indicates better performance in the testing set.
 On the other hand, the single-layer neural network are not resistant to changed of seed, as the MSE is greatly reduced and the RMSE decreases from 43418.85 to 37620.59. Unfortunately, the picture of the loss function graph is distorted, and we wouldn't able to placed the page here but rather at the end. 
 
 ## Discussion
+After testing our three methods on the House Rent dataset with the seed set to 123, we got RMSE values of 42,803.14, 2014.33, and 43,418.85 for Multiple Linear regression, KNN regression, and Single-Layer Neural Network respectively. Based on these values it is very clear that the KNN method with a k-value of 2 is significantly better than both of these methods. The performance is roughly 20 times better with this metric alone. We also wanted to test the models accuracy against varying seed values to ensure that they are robust and not easily affected by small changes. From this testing we confirmed that none of the models were immune to changes in the seed. The KNN regression in particular was able to get its RMSE as low as 400 which is far lower than the neural networks ~37,620. 
 
 ## Conclusion
 
