@@ -61,6 +61,8 @@ library(ggplot2)
 library(keras)
 library(ISLR2)
 library(FNN)
+library(FactoMineR)
+library(factoextra)
 
 # Load the dataset
 hrp <- read.csv("House_Rent_Dataset.csv")
@@ -166,6 +168,51 @@ hrp %>%
 Clearly Unfurnished houses tend to have less bathrooms than Semi-Furnished and Furnished houses, while Semi-Furnished and Furnished houses seem to generally have the same amount of bathrooms as each other.
 
 ### Hierarchical clustering
+
+### Principal Component Analysis (PCA)
+```{r}
+# Create indicator variables
+hrp_update <- hrp %>%
+  mutate(
+    Area.indicator = case_when(
+      Area.Type == "Built Area" ~ 1,
+      Area.Type == "Carpet Area" ~ 2,
+      Area.Type == "Super Area" ~ 3
+    ),
+    Furnishing.indicator = case_when(
+      Furnishing.Status == "Furnished" ~ 1,
+      Furnishing.Status == "Semi-Furnished" ~ 2,
+      Furnishing.Status == "Unfurnished" ~ 3
+    ),
+    Contact.indicator = case_when(
+      Point.of.Contact == "Contact Agent" ~ 1,
+      Point.of.Contact == "Contact Builder" ~ 2,
+      Point.of.Contact == "Contact Owner" ~ 3
+    )
+  )
+
+# Scale the data
+xvars <- c("BHK", "Size", "Area.indicator", "Furnishing.indicator", "Bathroom", "Contact.indicator")
+hrp_update[ , xvars] <- scale(hrp_update[ , xvars], center = TRUE, scale = TRUE)
+
+# Perform principal component analysis
+pca <- PCA(hrp_update[ , xvars], graph = FALSE)
+
+# Plot the first two principal components
+fviz_pca_var(pca, col.var = "contrib", col.ind = "cos2", select.var = list(contrib = 10), repel = TRUE) +
+  theme_minimal() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  ggtitle("PCA Plot of House Rent Dataset") +
+  xlab(paste0("PC1 (", round(pca$eig[1, 2], 2) * 100, "%)")) +
+  ylab(paste0("PC2 (", round(pca$eig[2, 2], 2) * 100, "%)"))
+
+```
+
+
 
 ## Methodology
 
