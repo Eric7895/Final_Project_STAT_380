@@ -1,6 +1,6 @@
 ---
 title: 'Final Project: Report 2'
-author: "Eric Wu"
+author: "Eric Wu,Matthew Brady"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
