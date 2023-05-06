@@ -1,11 +1,10 @@
 ---
 title: 'Final Project: Report 2'
-author: "Eric Wu, Caden Summers, Jacob O'Leary, Yu-Hsin Liao, Matthew Brady"
+author: "Eric Wu"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
   html_document: default
-  word_document: default
 editor_options:
   markdown:
     wrap: sentence
@@ -61,8 +60,7 @@ library(ggplot2)
 library(keras)
 library(ISLR2)
 library(FNN)
-library(FactoMineR)
-library(factoextra)
+library(dplyr)
 
 # Load the dataset
 hrp <- read.csv("House_Rent_Dataset.csv")
@@ -122,10 +120,6 @@ set.seed(NULL)
 train <- hrp[train_ind, ]
 test <- hrp[-train_ind, ]
 
-# Not scaled data with alternative seed
-train_alter_lin <- hrp[train_ind_alter, ]
-test_alter_lin <- hrp[-train_ind_alter, ]
-
 # Scaled data
 train_scale <- hrp_update[train_ind, ]
 test_scale <- hrp_update[-train_ind, ]
@@ -168,51 +162,19 @@ hrp %>%
 Clearly Unfurnished houses tend to have less bathrooms than Semi-Furnished and Furnished houses, while Semi-Furnished and Furnished houses seem to generally have the same amount of bathrooms as each other.
 
 ### Hierarchical clustering
-
-### Principal Component Analysis (PCA)
 ```{r}
-# Create indicator variables
-hrp_update <- hrp %>%
-  mutate(
-    Area.indicator = case_when(
-      Area.Type == "Built Area" ~ 1,
-      Area.Type == "Carpet Area" ~ 2,
-      Area.Type == "Super Area" ~ 3
-    ),
-    Furnishing.indicator = case_when(
-      Furnishing.Status == "Furnished" ~ 1,
-      Furnishing.Status == "Semi-Furnished" ~ 2,
-      Furnishing.Status == "Unfurnished" ~ 3
-    ),
-    Contact.indicator = case_when(
-      Point.of.Contact == "Contact Agent" ~ 1,
-      Point.of.Contact == "Contact Builder" ~ 2,
-      Point.of.Contact == "Contact Owner" ~ 3
-    )
-  )
-
-# Scale the data
-xvars <- c("BHK", "Size", "Area.indicator", "Furnishing.indicator", "Bathroom", "Contact.indicator")
-hrp_update[ , xvars] <- scale(hrp_update[ , xvars], center = TRUE, scale = TRUE)
-
-# Perform principal component analysis
-pca <- PCA(hrp_update[ , xvars], graph = FALSE)
-
-# Plot the first two principal components
-fviz_pca_var(pca, col.var = "contrib", col.ind = "cos2", select.var = list(contrib = 10), repel = TRUE) +
-  theme_minimal() +
-  theme(axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank()) +
-  ggtitle("PCA Plot of House Rent Dataset") +
-  xlab(paste0("PC1 (", round(pca$eig[1, 2], 2) * 100, "%)")) +
-  ylab(paste0("PC2 (", round(pca$eig[2, 2], 2) * 100, "%)"))
-
+hc <- hclust(dist(train_scale))
+hc
 ```
-
-
+```{r}
+# plot dedrogram (complete linkage)
+plot(hc, hang=-1)
+```
+```{r}
+cut_avg <- cutree(hc, k = 2000)
+plot(hc)
+```
+Due to the high amount of variables in this dataset conduction hierarchical clustering is extremely difficult resluting in a denograph that is impossible to read.
 
 ## Methodology
 
@@ -224,10 +186,9 @@ The primary focus is to compare the RMSE produced by each model.
 
 ```{r}
 base_model <- lm(Rent ~ . - Area.Locality - Floor - Posted.On, data=train)
-base_model2 <- lm(Rent ~ . - Area.Locality - Floor - Posted.On, data=train_alter_lin)
 
 linear_model <- step(base_model, direction="backward")
-linear_model2 <- step(base_model2, direction="backward")
+
 ```
 
 ```{r}
@@ -239,21 +200,10 @@ test_linpred <-
   mutate(Resid.Square = (Rent-linpred)^2)
 
 sqrt(sum(test_linpred$Resid.Square)/nrow(test_linpred))
+
 ```
 
-```{r}
-linpred2 <- predict(linear_model2, newdata=test_alter_lin)
-
-test_linpred2 <- 
-  test_alter_lin %>%
-  cbind(linpred2) %>%
-  mutate(Resid.Square = (Rent-linpred2)^2)
-
-sqrt(sum(test_linpred2$Resid.Square)/nrow(test_linpred2))
-```
-
-RMSE with seed 123 for multiple linear regression is 42803.14, while with seed 12345 RMSE is 39529.23.
-So, there is a potential for slight variations in the RMSE based on the random seed, but not too significant, as this is a less than 10% difference in RMSE.
+RMSE with this seed (123) for multiple linear regression is 42803.14.
 
 ### KNN Regression
 
@@ -261,32 +211,20 @@ So, there is a potential for slight variations in the RMSE based on the random s
 xvars <- names(select_if(train_scale, is.numeric))
 maxK <- 20 
 mse_vec <- rep(NA, maxK)
-mse_vec2 <- rep(NA, maxK)
 rmse_vec <- rep(NA, maxK)
-rmse_vec2 <- rep(NA, maxK)
 
 for(i in 1:maxK){
   knn_res <- knn.reg(train = train_scale[ , xvars, drop = FALSE],
                    test = test_scale[ , xvars, drop = FALSE],
                    y = train_scale$Rent,
                    k = i)
-  knn_res2 <- knn.reg(train = train_alter[ , xvars, drop = FALSE],
-                   test = test_alter[ , xvars, drop = FALSE],
-                   y = train_alter$Rent,
-                   k = i)
   
   mse_vec[i] <- mean((test_scale$Rent - knn_res$pred)^2)
-  mse_vec2[i] <- mean((test_alter$Rent - knn_res2$pred)^2)
 
   rmse_vec[i] <- sqrt(mse_vec[i])
-  rmse_vec2[i] <- sqrt(mse_vec2[i])
 }
 choice_k <- data.frame(k = 1:maxK, rmse = rmse_vec)
 ggplot(data = choice_k, mapping = aes(x = k, y = rmse)) +
-   geom_line()
-
-choice_k2 <- data.frame(k = 1:maxK, rmse = rmse_vec2)
-ggplot(data = choice_k2, mapping = aes(x = k, y = rmse)) +
    geom_line()
 # Based on the graph the best K value seems to be the lowest point on the graph.
 
@@ -295,9 +233,7 @@ ggplot(data = choice_k2, mapping = aes(x = k, y = rmse)) +
 ```{r}
 # Based on the front of this vector the best K value is 2.
 head(choice_k)
-head(choice_k2)
-# The KNN regression is also not immune to seed changes and in this case results in an RMSE that is 1600 lower than the first seed tested.
-# Although the RMSE has changed significantly, it is still far better than the other methods presented
+
 ```
 
 ### Single-Layer Neural Network
@@ -362,11 +298,10 @@ Which indicates better performance in the testing set.
 On the other hand, the single-layer neural network are not resistant to changed of seed, as the MSE is greatly reduced and the RMSE decreases from 43418.85 to 37620.59. Unfortunately, the picture of the loss function graph is distorted, and we wouldn't able to placed the page here but rather at the end. 
 
 ## Discussion
-After testing our three methods on the House Rent dataset with the seed set to 123, we got RMSE values of 42,803.14, 2014.33, and 43,418.85 for Multiple Linear regression, KNN regression, and Single-Layer Neural Network respectively. Based on these values it is very clear that the KNN method with a k-value of 2 is significantly better than both of these methods. The performance is roughly 20 times better with this metric alone. We also wanted to test the models accuracy against varying seed values to ensure that they are robust and not easily affected by small changes. From this testing we confirmed that none of the models were immune to changes in the seed. The KNN regression in particular was able to get its RMSE as low as 400 which is far lower than the neural networks ~37,620. 
 
 ## Conclusion
 
-Overall, the project is very successful and we get to review and learn more about the implementation of various methods that was taught in class. In addition, the project allows us to examine the parameters of single-layer neural network, and the optimization function that goes along with the train process. 
+Overall, the project is very successful and we get to review and learn more about the implementation of various methods that was taught in class. In addition, the project allows us to examine the parameters of single-layer neural network, and the optimzation function that goes along with the train process. 
 
 ## Code Appendix
 ```{r code Appendix}
@@ -377,9 +312,3 @@ Overall, the project is very successful and we get to review and learn more abou
 ```
 
 ![Image 2: Training Results from single-layer Neural Network using alternative seed](C:/Users/wue77/Documents/GitHub/Final_Project_STAT_380/Rplot2.PNG)
-
-## Contributions
-Caden: KNN regression, Discussion
-Jacob: Multiple Linear Regression, Data Visualization
-Eric: Introduction, Neural network, conclusion
-Yu-Hsin: PCA Plot
